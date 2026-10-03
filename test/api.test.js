@@ -327,3 +327,10 @@ test('CSV export neutralises spreadsheet formulas', async () => {
   const { toCsv } = await import('../src/util.js');
   assert.equal(toCsv([{ a: '=HYPERLINK("x")', b: -5 }]), 'a,b\r\n"\'=HYPERLINK(""x"")",-5\r\n');
 });
+
+test('QR decoder for Safari/iPad camera scanning is served from the app', async () => {
+  const res = await fetch(`${base}/vendor/jsQR.js`);
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get('content-type'), /javascript/);
+  assert.match(await res.text(), /jsQR/);
+});

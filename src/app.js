@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { authenticate } from './auth.js';
 import { HttpError } from './util.js';
 import { publicRoutes } from './routes/public.js';
@@ -10,6 +11,8 @@ import { integrationRoutes } from './routes/integrations.js';
 import { createGateway } from './services/payments.js';
 
 const PUBLIC_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public');
+// QR decoder for browsers without BarcodeDetector (Safari on iPad/iPhone).
+const JSQR_FILE = createRequire(import.meta.url).resolve('jsqr/dist/jsQR.js');
 
 export function createApp({ db, gateway = createGateway(), secret = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex') } = {}) {
   const app = express();
@@ -54,6 +57,7 @@ export function createApp({ db, gateway = createGateway(), secret = process.env.
 
   app.use('/api', (_req, _res, next) => next(new HttpError(404, 'Not found')));
 
+  app.get('/vendor/jsQR.js', (_req, res) => res.type('application/javascript').set('Cache-Control', 'public, max-age=86400').sendFile(JSQR_FILE));
   app.use(express.static(PUBLIC_DIR, { extensions: ['html'] }));
 
   // eslint-disable-next-line no-unused-vars

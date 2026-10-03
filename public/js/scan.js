@@ -46,33 +46,70 @@ function updateCounts(perfs) {
   $('#counts').textContent = p ? `${p.scanned} of ${p.sold} admitted` : 'No performances in the scanning window.';
 }
 
+// Prefer the browser's native BarcodeDetector (Chrome on Android/macOS); fall
+// back to the jsQR decoder elsewhere, notably Safari on iPad and iPhone.
+async function createDecoder() {
+  if ('BarcodeDetector' in window) {
+    const formats = await window.BarcodeDetector.getSupportedFormats?.().catch(() => []) ?? [];
+    if (formats.includes('qr_code')) {
+      const native = new window.BarcodeDetector({ formats: ['qr_code'] });
+      return async (video) => (await native.detect(video).catch(() => []))[0]?.rawValue;
+    }
+  }
+  await new Promise((resolve, reject) => {
+    const tag = document.createElement('script');
+    tag.src = '/vendor/jsQR.js';
+    tag.onload = resolve;
+    tag.onerror = () => reject(new Error('Could not load the QR decoder'));
+    document.head.append(tag);
+  });
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  return async (video) => {
+    // Downscale large camera frames; QR codes stay readable and decoding stays fast.
+    const scale = Math.min(1, 640 / Math.max(video.videoWidth, video.videoHeight));
+    canvas.width = Math.round(video.videoWidth * scale);
+    canvas.height = Math.round(video.videoHeight * scale);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    return window.jsQR(image.data, image.width, image.height, { inversionAttempts: 'dontInvert' })?.data;
+  };
+}
+
 async function startCamera() {
-  if (!('BarcodeDetector' in window)) {
-    showError('#result', 'Camera scanning is not supported in this browser; use a handheld scanner or type the code.');
+  if (!navigator.mediaDevices?.getUserMedia) {
+    showError('#result', 'Camera access needs a secure (https) connection; use a handheld scanner or type the code.');
     return;
   }
-  detector = new window.BarcodeDetector({ formats: ['qr_code'] });
-  stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+  try {
+    detector = await createDecoder();
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+  } catch (e) {
+    showError('#result', e.name === 'NotAllowedError' ? 'Camera permission was denied. Allow camera access for this site in Settings and try again.' : e);
+    return;
+  }
   const video = $('#video');
   video.srcObject = stream;
   video.classList.remove('hidden');
   await video.play();
   $('#cam').classList.add('hidden');
+  $('#result').innerHTML = '<p class="muted small">Point the camera at a ticket QR code.</p>';
   const loop = async () => {
-    if (!busy && video.readyState >= 2) {
-      const codes = await detector.detect(video).catch(() => []);
-      if (codes[0]) await check(codes[0].rawValue);
+    if (!busy && video.readyState >= 2 && video.videoWidth) {
+      const code = await detector(video);
+      if (code) await check(code, { fromCamera: true });
     }
-    requestAnimationFrame(loop);
+    setTimeout(loop, 120);
   };
   loop();
 }
 
-async function check(code) {
+async function check(code, { fromCamera = false } = {}) {
   code = String(code || '').trim().toUpperCase();
   if (!code) return;
-  // Ignore the same code held in front of the camera for a couple of seconds.
-  if (code === lastCode && Date.now() - lastAt < 2500) return;
+  // The camera sees a ticket many times a second while it is held up; ignore
+  // repeats so the "ADMIT" result isn't replaced by "ALREADY SCANNED".
+  if (fromCamera && code === lastCode && Date.now() - lastAt < 10_000) return;
   lastCode = code; lastAt = Date.now();
   busy = true;
   try {

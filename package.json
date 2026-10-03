@@ -16,6 +16,7 @@
   "private": true,
   "dependencies": {
     "express": "^4.22.3",
+    "jsqr": "^1.4.0",
     "qrcode": "^1.5.4"
   }
 }
