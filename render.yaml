@@ -1,0 +1,17 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+# Free plan: the filesystem is not persistent, so the SQLite database resets
+# (and demo data is re-seeded) whenever the service restarts or redeploys.
+services:
+  - type: web
+    name: california-ticketing-system
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: SESSION_SECRET
+        generateValue: true

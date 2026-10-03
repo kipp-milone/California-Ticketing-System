@@ -21,7 +21,7 @@ npm start            # http://localhost:3000. Seeds demo data on first run.
 npm test             # API test suite (node:test)
 ```
 
-It requires Node.js 22.5 or later and uses the built-in `node:sqlite`, so there is no external database to install. Data is stored in `data/ticketing.db`.
+It requires Node.js 22.13 or later and uses the built-in `node:sqlite`, so there is no external database to install. Data is stored in `data/ticketing.db`.
 
 ### Demo accounts
 
@@ -75,6 +75,21 @@ test/api.test.js      end-to-end API tests
 2. Charge the card through the gateway.
 3. In one SQLite transaction, re-price and re-validate the cart, then write the order, lines, tickets, donations, payment and journal.
 4. If step 3 fails, for example because another buyer took the last GA seat during the charge, the charge is refunded automatically.
+
+### Deploy to Render (free demo)
+
+The repo includes a Render Blueprint (`render.yaml`) that creates a free web service on Node 22 with a randomly generated `SESSION_SECRET`.
+
+1. Sign in at [render.com](https://render.com) with GitHub and give Render access to this repository.
+2. Choose **New → Blueprint**, select this repository and click **Apply**. You can also use [this deploy link](https://render.com/deploy?repo=https://github.com/kipp-milone/California-Ticketing-System).
+3. When the build finishes, open the `https://…onrender.com` address Render shows. Every push to `main` redeploys automatically.
+
+Limits of the free plan:
+
+- **The database resets** whenever the service restarts, redeploys or wakes up, because the free plan has no persistent disk. Demo data is seeded again on each start.
+- **It sleeps when idle.** The first visit after about 15 minutes without traffic takes roughly a minute while the service starts.
+
+For real use, switch to a paid instance type, attach a persistent disk mounted at `/var/data`, and set `DATABASE_FILE=/var/data/ticketing.db` and `SEED_DEMO=false`.
 
 ### Production configuration
 
