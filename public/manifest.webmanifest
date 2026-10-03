@@ -1,0 +1,9 @@
+{
+  "name": "Civic Arts Tickets",
+  "short_name": "Tickets",
+  "start_url": "/tickets.html",
+  "display": "standalone",
+  "background_color": "#f7f5f2",
+  "theme_color": "#8a1c2b",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "california-ticketing-system",
+  "version": "1.0.0",
+  "description": "Multi-venue performing arts ticketing system: assigned/GA seating, series & subscriptions, multi-entity donations, mobile tickets, transfers, scanning, financial ledger, exports, marketing and POS.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning src/server.js",
+    "seed": "node --disable-warning=ExperimentalWarning scripts/seed.js",
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "express": "^4.22.3",
+    "qrcode": "^1.5.4"
+  }
+}
