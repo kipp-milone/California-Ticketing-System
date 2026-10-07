@@ -14,7 +14,7 @@
   function date(s) { return new Date(s.replace(' ', 'T') + 'Z').toLocaleString('en-US', { timeZone: 'America/Los_Angeles', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
   var css = ':host{all:initial;font:15px/1.45 system-ui,sans-serif;color:#1d1b19}.list{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}' +
     '.e{border:1px solid #e2ddd5;border-radius:10px;padding:14px;background:#fff;display:flex;flex-direction:column;gap:6px}.t{font-weight:700;font-size:1.05em}.m{color:#6b655e;font-size:.88em}' +
-    'a.b{margin-top:auto;background:#8a1c2b;color:#fff;text-decoration:none;padding:8px 12px;border-radius:8px;text-align:center;font-weight:600}';
+    'a.b{margin-top:auto;background:#b51f2a;color:#fff;text-decoration:none;padding:8px 12px;border-radius:8px;text-align:center;font-weight:600}';
   function render(el) {
     var q = new URLSearchParams();
     if (el.dataset.venueId) q.set('venue_id', el.dataset.venueId);

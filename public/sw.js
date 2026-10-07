@@ -1,7 +1,7 @@
 // Offline support: cache the app shell and the last-viewed tickets (including
 // QR codes) so patrons can show tickets at the door without connectivity.
-const CACHE = 'ctms-v1';
-const SHELL = ['/', '/tickets.html', '/ticket.html', '/css/app.css', '/js/common.js', '/js/tickets.js', '/js/ticket.js', '/icon.svg'];
+const CACHE = 'ctms-v2';
+const SHELL = ['/', '/tickets.html', '/ticket.html', '/css/app.css', '/js/common.js', '/js/tickets.js', '/js/ticket.js', '/icon.svg', '/img/ca-flag.svg', '/img/ca-bear.svg'];
 
 self.addEventListener('install', (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())));
 self.addEventListener('activate', (e) => e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())));

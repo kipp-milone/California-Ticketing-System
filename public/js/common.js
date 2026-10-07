@@ -89,7 +89,7 @@ export function header(active = '') {
   const el = document.createElement('header');
   el.className = 'site-header';
   el.innerHTML = `<div class="inner">
-    <a class="brand" href="/">Civic <span>Arts</span> Tickets</a>
+    <a class="brand" href="/"><img src="/img/ca-flag.svg" alt=""><span>Civic <b>Arts</b> Tickets<small>California</small></span></a>
     <nav class="nav" aria-label="Main">
       ${links.map(([href, label, key]) => `<a href="${href}" class="${key === active ? 'active' : ''}">${h(label)}</a>`).join('')}
       <a href="/cart.html" class="${active === 'cart' ? 'active' : ''}">Cart<span id="cart-count" class="cart-badge hidden"></span></a>
@@ -97,7 +97,7 @@ export function header(active = '') {
   document.body.prepend(el);
   const f = document.createElement('footer');
   f.className = 'site';
-  f.innerHTML = 'Box office & 24/7 ticketing support: <a href="/support.html">Help center</a> · <a href="/api/health">System status</a>';
+  f.innerHTML = '<img src="/img/ca-flag.svg" alt="California state flag">Box office & 24/7 ticketing support: <a href="/support.html">Help center</a> · <a href="/api/health">System status</a>';
   document.body.append(f);
   renderCartBadge();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});

@@ -21,8 +21,12 @@ function filters() {
 function renderShell(venues, events) {
   const categories = [...new Set(events.map((e) => e.category).filter(Boolean))].sort();
   app.innerHTML = `
-    <h1>Upcoming performances</h1>
-    <p class="muted">Concerts, dance, theater and free community events across every stage.</p>
+    <section class="hero">
+      <div><div class="eyebrow">&#9733; California performing arts</div>
+        <h1>Upcoming performances</h1>
+        <p class="muted">Concerts, dance, theater and free community events across every stage.</p></div>
+      <img src="/img/ca-flag.svg" alt="California state flag">
+    </section>
     <form id="filters" class="card row" role="search">
       <div><label for="f-q">Search</label><input id="f-q" type="search" placeholder="Title"></div>
       <div><label for="f-venue_id">Venue</label><select id="f-venue_id"><option value="">All venues</option>${venues.map((v) => `<option value="${v.id}">${h(v.name)}</option>`).join('')}</select></div>
@@ -38,7 +42,7 @@ function renderEvents(events) {
     const next = e.performances[0];
     const free = e.min_price_cents === 0;
     return `<article class="card event-card">
-      <div class="poster" ${e.image_url ? `style="background-image:url('${h(e.image_url)}');background-size:cover"` : ''}>${h(e.category || '')}</div>
+      <div class="poster${e.image_url ? ' photo' : ''}" ${e.image_url ? `style="background-image:url('${h(e.image_url)}');background-size:cover"` : ''}>${h(e.category || '')}</div>
       <h2 style="margin:0"><a href="/event.html?id=${e.id}">${h(e.title)}</a></h2>
       <div class="muted small">${h(e.venues.join(' · '))}</div>
       <div class="small">${next ? fmtDate(next.starts_at) : ''}${e.performances.length > 1 ? ` <span class="muted">+ ${e.performances.length - 1} more</span>` : ''}</div>
